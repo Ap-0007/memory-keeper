@@ -1,0 +1,17 @@
+{
+  "name": "memory-keeper",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A personal AI-powered journaling companion that uses natural language processing to analyze and provide insights on your thoughts and emotions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^14.0.3",
+    "node-fetch": "^3.3.2"
+  }
+}
