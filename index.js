@@ -2,7 +2,10 @@ import { program } from 'commander';
 import fs from 'fs/promises';
 import path from 'path';
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
+
+dotenv.config({ path: path.join(path.dirname(fileURLToPath(import.meta.url)), '.env') });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,24 +81,31 @@ Journal Entries:
 ${entriesText}`;
 
     try {
-      const response = await fetch('http://127.0.0.1:11434/api/generate', {
+      const apiKey = process.env.GROQ_API_KEY;
+      if (!apiKey) {
+        throw new Error("GROQ_API_KEY is not set in .env");
+      }
+
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
         body: JSON.stringify({
-          model: 'llama3.2', // Using the default Ollama model for the user's system
-          prompt: prompt,
-          stream: false
+          model: 'llama-3.3-70b-versatile',
+          messages: [{ role: 'user', content: prompt }]
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Ollama API error: ${response.statusText}`);
+        throw new Error(`Groq API error: ${response.statusText}`);
       }
 
       const result = await response.json();
-      console.log(result.response);
+      console.log(result.choices[0].message.content);
     } catch (err) {
-      console.error("❌ Failed to reach the local Ollama AI model. Make sure Ollama is running.", err.message);
+      console.error("❌ Failed to reach the Groq API.", err.message);
     }
   });
 
